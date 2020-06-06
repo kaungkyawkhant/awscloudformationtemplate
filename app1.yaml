@@ -1,8 +1,4 @@
 Resources:
 MyInstance
   Type: AWS::EC2::Instance
-<<<<<<< HEAD
-master changes
-=======
-changed in very bad branch
->>>>>>> 473a261723890591a5d2d1c06c2222056fc83968
+changed in very bad
