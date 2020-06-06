@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: AWS CloudFormation Template for IAM_User_Group_and_Policies.
+Parameters:
+  IAMUserName:
+    Type: String
+    Description: IAM User name
+    MinLength: '1'
+    MaxLength: '16'
+  Password:
+    NoEcho: 'true'
+    Type: String
+    Description: New account password
+    MinLength: '8'
+    MaxLength: '16'
+    ConstraintDescription: the password must be between 1 and 16 characters
+Resources:
+  CFNAdminGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: CFN-Administrators-Group
+  S3AdminGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: S3-Administrators-Group
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+  CFNAdminPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CFNFullAccessPolicy
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'cloudformation:*'
+            Resource: '*'
+      Groups:
+        - !Ref CFNAdminGroup
+  IAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      LoginProfile:
+        Password: !Ref Password
+      UserName: !Ref IAMUserName
+  AddUserToCFNAdminGroup:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref CFNAdminGroup
+      Users: 
+        - !Ref IAMUser
+  AddUserToS3AdminGroup:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref S3AdminGroup
+      Users:
+        - !Ref IAMUser
+  IAMAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref IAMUser
+Outputs:
+  IAMUser:
+    Description: IAM User Name
+    Value: !Ref IAMUser
+  IAMUserARN:
+    Description: User ARN
+    Value: !GetAtt IAMUser.Arn
+  AccessKey:
+    Description: AWS access key ID for the specified user
+    Value: !Ref IAMAccessKey
+  SecretAccessKey:
+    Description: AWS secret access key ID for the specified user
+    Value: !GetAtt IAMAccessKey.SecretAccessKey
