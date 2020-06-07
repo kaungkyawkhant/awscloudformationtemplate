@@ -1,4 +1,0 @@
-Resources:
-MyInstance
-  Type: AWS::EC2::Instance
-changed in very bad
